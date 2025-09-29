@@ -19,7 +19,6 @@ class AnimeViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = [
         "title", "description", "director", "studio", "genre",
         "seasons__title", 
-        "seasons__episodes__title", 
         "year"
     ]
 
