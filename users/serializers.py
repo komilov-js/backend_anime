@@ -4,7 +4,9 @@ from django.contrib.auth.password_validation import validate_password
 from .models import ProfileImg
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password = serializers.CharField(
+        write_only=True, required=True, validators=[validate_password]
+    )
     password2 = serializers.CharField(write_only=True, required=True)
 
     class Meta:
@@ -12,8 +14,18 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ("username", "email", "password", "password2")
 
     def validate(self, attrs):
+        # 1️⃣ Parollar bir xil bo‘lishi kerak
         if attrs["password"] != attrs["password2"]:
             raise serializers.ValidationError({"password": "Parollar mos kelmadi!"})
+
+        # 2️⃣ Username oldindan mavjud bo‘lmasligi kerak
+        if User.objects.filter(username=attrs["username"]).exists():
+            raise serializers.ValidationError({"username": "Bunday foydalanuvchi nomi allaqachon mavjud!"})
+
+        # 3️⃣ Email oldindan mavjud bo‘lmasligi kerak
+        if User.objects.filter(email=attrs["email"]).exists():
+            raise serializers.ValidationError({"email": "Bu email bilan hisob allaqachon yaratilgan!"})
+
         return attrs
 
     def create(self, validated_data):
@@ -25,11 +37,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
+
 class UserSerializer(serializers.ModelSerializer):
     profile_img = serializers.ImageField(source="profile_img.image", read_only=True)
 
     class Meta:
         model = User
         fields = ("id", "username", "email", "profile_img")
-        
-        

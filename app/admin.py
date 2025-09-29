@@ -1,25 +1,38 @@
+import nested_admin
 from django.contrib import admin
-from .models import Anime, Category, Episode
+from .models import Anime, Category, Season, Episode
 
-class EpisodeInline(admin.TabularInline):
+# 🔥 Episode inline
+class EpisodeInline(nested_admin.NestedTabularInline):
     model = Episode
     extra = 1
     ordering = ("episode_number",)
 
-@admin.register(Anime)
-class AnimeAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "slug", "category", "created_at")
-    list_filter = ("category", "created_at")
-    list_display_links = ("title",) 
-    search_fields = ("title", "description", "director", "studio", "genre")
-    inlines = [EpisodeInline]
-    # ⚡ prepopulated_fields shunchaki yangi qo'shishda avtomatik slug hosil qiladi
-    prepopulated_fields = {"slug": ("title",)}
-    # slug ham tahrirlashga ruxsat beriladi (readonly qilinmagan)
-    readonly_fields = ()  # bo‘sh, hech narsa readonly emas
+# 🔥 Season inline (Episode bilan nested)
+class SeasonInline(nested_admin.NestedTabularInline):
+    model = Season
+    inlines = [EpisodeInline]  # nested Episode
+    extra = 1
+    ordering = ("season_number",)
 
+# 🔥 Anime admin (Season → Episode nested)
+@admin.register(Anime)
+class AnimeAdmin(nested_admin.NestedModelAdmin):
+    list_display = ("id", "title", "slug", "get_categories", "created_at")  # ⚡ ManyToMany ni method orqali ko'rsatish
+    list_filter = ("category", "created_at")
+    list_display_links = ("title",)
+    search_fields = ("title", "director", "genre")
+    inlines = [SeasonInline]
+    prepopulated_fields = {"slug": ("title",)}
+    filter_horizontal = ("category",)  # ⚡ category ni multi-select qilish
+
+    def get_categories(self, obj):
+        return ", ".join([c.name for c in obj.category.all()])
+    get_categories.short_description = "Categories"
+
+# 🔥 Category admin
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "slug")
     prepopulated_fields = {"slug": ("name",)}
-    readonly_fields = ()  # hech narsa readonly emas
+    list_display_links = ("name",)
