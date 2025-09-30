@@ -4,6 +4,11 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 from .serializers import RegisterSerializer, UserSerializer
 from .models import ProfileImg
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -31,3 +36,13 @@ class UserView(generics.RetrieveAPIView):
             return Response(data)
         except ProfileImg.DoesNotExist:
             return Response(serializer.data)
+        
+        
+
+@api_view(["GET"])
+@permission_classes([IsAdminUser])
+def admin_stats(request):
+    return Response({
+        "users_count": User.objects.count(),
+        "active_users": User.objects.filter(is_active=True).count(),
+    })
