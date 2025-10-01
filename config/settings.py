@@ -64,6 +64,16 @@ MIDDLEWARE = [
 ]
 
 
+DEBUG = False  # productionda True bo‘lmasligi kerak
+
+ALLOWED_HOSTS = ['komilov1.pythonanywhere.com']  # domeningizni qo‘shing
+
+STATIC_URL = '/static/'
+
+# PythonAnywhere uchun to‘liq yo‘l
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=7),  # 10 daqiqa
     "REFRESH_TOKEN_LIFETIME": timedelta(minutes=10),     # 7 kun
