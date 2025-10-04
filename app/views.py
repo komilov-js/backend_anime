@@ -71,17 +71,35 @@ class SavedAnimeViewSet(viewsets.ModelViewSet):
 def sitemap_view(request):
     animes = Anime.objects.all()
     urls = ""
+
     for anime in animes:
         lastmod = anime.created_at.date() if hasattr(anime, "created_at") else timezone.now().date()
         urls += f"""
         <url>
             <loc>https://anivibe.uz/anime/{anime.slug}</loc>
             <lastmod>{lastmod}</lastmod>
+            <priority>0.9</priority>
+            <changefreq>daily</changefreq>
         </url>
         """
 
     sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+        <!-- Asosiy sahifa -->
+        <url>
+            <loc>https://anivibe.uz/</loc>
+            <priority>1.0</priority>
+            <changefreq>daily</changefreq>
+        </url>
+
+        <!-- Kategoriyalar -->
+        <url>
+            <loc>https://anivibe.uz/anime</loc>
+            <priority>0.8</priority>
+            <changefreq>daily</changefreq>
+        </url>
+
         {urls}
     </urlset>"""
 
