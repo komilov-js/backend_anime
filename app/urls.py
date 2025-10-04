@@ -9,5 +9,5 @@ router.register(r'saved-animes', SavedAnimeViewSet, basename='saved_anime')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('sitemap.xml', sitemap_view, name='sitemap'),
+    path('sitemap.xml', sitemap_view, name='sitemap'),  # ✅ Muhim qator
 ]

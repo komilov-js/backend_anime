@@ -67,11 +67,12 @@ class SavedAnimeViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user, anime=anime)
 
 
+
 def sitemap_view(request):
     animes = Anime.objects.all()
     urls = ""
     for anime in animes:
-        lastmod = anime.updated_at.date() if hasattr(anime, "updated_at") else timezone.now().date()
+        lastmod = anime.created_at.date() if hasattr(anime, "created_at") else timezone.now().date()
         urls += f"""
         <url>
             <loc>https://anivibe.uz/anime/{anime.slug}</loc>
