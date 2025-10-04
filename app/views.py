@@ -1,6 +1,8 @@
 from rest_framework import viewsets, filters, permissions
 from rest_framework.exceptions import ValidationError
 from .models import Anime, Category, SavedAnime
+from django.http import HttpResponse
+from django.utils import timezone
 from .serializers import (
     AnimeSerializer,
     CategorySerializer,
@@ -64,3 +66,22 @@ class SavedAnimeViewSet(viewsets.ModelViewSet):
         # Saqlash
         serializer.save(user=self.request.user, anime=anime)
 
+
+def sitemap_view(request):
+    animes = Anime.objects.all()
+    urls = ""
+    for anime in animes:
+        lastmod = anime.updated_at.date() if hasattr(anime, "updated_at") else timezone.now().date()
+        urls += f"""
+        <url>
+            <loc>https://anivibe.uz/anime/{anime.slug}</loc>
+            <lastmod>{lastmod}</lastmod>
+        </url>
+        """
+
+    sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+        {urls}
+    </urlset>"""
+
+    return HttpResponse(sitemap, content_type="application/xml")
