@@ -17,7 +17,7 @@ class AnimeViewSet(viewsets.ReadOnlyModelViewSet):
 
     # 🔍 endi search Anime + Season + Episode bo‘yicha ham ishlaydi
     search_fields = [
-        "title", "description", "director", "studio", "genre",
+        "title", "genre",
         "seasons__title", 
         "year"
     ]
